@@ -22,7 +22,7 @@ export function YouTubeLogo({ className = "" }: YouTubeLogoProps) {
           />
         </svg>
       </div>
-      <div className="text-white text-lg font-bold">YouTube</div>
+      <div className="text-gray-900 dark:text-white text-lg font-bold">YouTube</div>
     </div>
   );
 } 

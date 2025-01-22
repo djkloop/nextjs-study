@@ -59,6 +59,8 @@ export default {
 		backgroundImage: {
 			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+			'gradient-nav-light': 'linear-gradient(-90deg, rgba(255, 255, 255, 0) 1%, rgba(255, 255, 255, .6) 99%)',
+			'gradient-nav-line': 'linear-gradient(-90deg, rgba(20, 20, 20, 0) 1%, rgba(20, 20, 20, .6) 99%)',
 		}
   	}
   },

@@ -5,8 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { YouTubeLogo } from "@/components/YouTubeLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { usePathname } from 'next/navigation';
 
 export default function Home() {
+  const pathname = usePathname();
+
   const sideNavItems = [
     { icon: "⭐", label: "首页", href: "/" },
     { icon: "👑", label: "VIP会员", href: "/vip" },
@@ -122,41 +126,51 @@ export default function Home() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  // 自动轮播
   useEffect(() => {
-    const timer = setInterval(() => {
-      handleNext();
-    }, 3000);
+    let startTime: number;
+    let animationFrame: number;
+    const duration = 5000; // 5秒
 
-    return () => clearInterval(timer);
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      setProgress(progress);
+      
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        handleNext();
+      }
+    };
+
+    setProgress(0);
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
   }, [currentIndex]);
 
-  // 处理下一个
   const handleNext = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
     setCurrentIndex((prev) => (prev + 1) % shows.length);
-    setTimeout(() => setIsAnimating(false), 300);
   };
 
-  // 处理上一个
   const handlePrev = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
     setCurrentIndex((prev) => (prev - 1 + shows.length) % shows.length);
-    setTimeout(() => setIsAnimating(false), 300);
   };
 
-  // 获取当前显示的内容
   const getCurrentShow = () => shows[currentIndex];
 
-  // 计算轮播项的位置
   const getVisibleShows = () => {
     return [...shows, ...shows, ...shows];
   };
 
-  // 将底部链接分组
   const footerLinks = {
     privacy: [
       { label: "腾讯视频隐私保护指引", href: "/privacy" },
@@ -180,44 +194,49 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1c1c1c]">
-      {/* Banner区域 - 使用44vw作为最大高度 */}
+    <div className="min-h-screen bg-background">
       <div className="fixed inset-0 z-0 h-[44vw]">
-        <Image
-          src={getCurrentShow().bannerImage}
-          alt={getCurrentShow().title}
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* 渐变遮罩 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+        <div className="relative w-full h-full">
+          <Image
+            src={getCurrentShow().bannerImage}
+            alt={getCurrentShow().title}
+            fill
+            className="object-cover object-[center_30%]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+        </div>
       </div>
 
-      {/* 主内容区域 */}
       <main className="relative z-10">
-        {/* Banner内容容器 */}
-        <div className="relative h-[44vw] pl-[220px]"> {/* 从200px改为220px */}
-          {/* Banner文字内容 - 左下角 */}
-          <div className="absolute bottom-20 left-[252px]"> {/* 从232px改为252px (220px + 32px padding) */}
-            <h1 className="text-white text-3xl font-bold mb-2">{getCurrentShow().title}</h1>
-            <p className="text-gray-300 mb-2 text-sm">{getCurrentShow().subtitle}</p>
-            <p className="text-gray-300 mb-4 text-sm">{getCurrentShow().description}</p>
+        <div className="relative h-[44vw] pl-[220px]">
+          <div className="absolute bottom-20 left-[252px]">
+            <h1 className="text-gray-900 dark:text-white text-3xl font-bold mb-2">
+              {getCurrentShow().title}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">
+              {getCurrentShow().subtitle}
+            </p>
+            <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+              {getCurrentShow().description}
+            </p>
             <div className="flex items-center gap-4">
-              <Button className="bg-blue-600/90 hover:bg-blue-600 px-6 py-1.5 text-sm">
+              <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-1.5 text-sm">
                 播放正片
               </Button>
-              <Button variant="ghost" className="text-white/90 hover:text-white p-1.5">
+              <Button variant="ghost" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white p-1.5">
                 <span className="text-xl">🔇</span>
               </Button>
             </div>
           </div>
 
-          {/* 轮播缩略图 - 右下角 */}
           <div className="absolute bottom-4 right-8">
             <div className="flex items-center gap-3">
-              <button onClick={handlePrev} className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center text-white/90 hover:text-white">
+              <button 
+                onClick={handlePrev} 
+                className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center text-white/90 hover:text-white self-center"
+              >
                 <span>←</span>
               </button>
               <div className="flex gap-3">
@@ -227,10 +246,10 @@ export default function Home() {
                     <div
                       key={`${show.id}-${index}`}
                       onClick={() => setCurrentIndex(index)}
-                      className="cursor-pointer w-[120px]"
+                      className="cursor-pointer w-[140px]"
                     >
                       <div className="relative">
-                        <div className="aspect-[16/9] rounded-sm overflow-hidden">
+                        <div className="aspect-[16/10] rounded-sm overflow-hidden">
                           <Image
                             src={show.image}
                             alt={show.title}
@@ -239,15 +258,27 @@ export default function Home() {
                               ${isActive ? 'opacity-100' : 'opacity-70'}`}
                           />
                         </div>
+                        {isActive && (
+                          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/20">
+                            <div 
+                              className="h-full bg-blue-500 transition-none"
+                              style={{
+                                width: `${progress * 100}%`
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                       
                       <div className="mt-2 text-center">
-                        <p className={`text-white text-xs truncate
-                          ${isActive ? 'text-blue-400' : ''}`}
-                        >
+                        <p className={`text-xs truncate ${
+                          isActive ? 'text-blue-400' : 'text-white/60'
+                        }`}>
                           {show.title}
                         </p>
-                        <p className="text-gray-400/80 text-[10px] truncate mt-0.5">
+                        <p className={`text-[10px] truncate mt-0.5 ${
+                          isActive ? 'text-white/80' : 'text-white/40'
+                        }`}>
                           {show.subtitle}
                         </p>
                       </div>
@@ -255,15 +286,17 @@ export default function Home() {
                   );
                 })}
               </div>
-              <button onClick={handleNext} className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center text-white/90 hover:text-white">
+              <button 
+                onClick={handleNext} 
+                className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center text-white/90 hover:text-white self-center"
+              >
                 <span>→</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* 推荐内容区域 */}
-        <div className="relative pl-[220px] px-8 py-4"> {/* 从200px改为220px */}
+        <div className="relative pl-[220px] px-8 py-4">
           <div className="grid grid-cols-5 gap-4">
             {recommendedShows.map((show) => (
               <div key={show.id} className="group cursor-pointer">
@@ -276,92 +309,91 @@ export default function Home() {
                       className="object-cover"
                     />
                   </div>
-                  <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded">
+                  <div className="absolute top-2 right-2 bg-primary text-white text-xs px-1.5 py-0.5 rounded">
                     {show.tag}
                   </div>
                 </div>
-                <h3 className="text-white text-xs font-medium truncate">{show.title}</h3>
-                <p className="text-gray-400 text-xs mt-0.5 truncate">{show.description}</p>
+                <h3 className="text-foreground text-xs font-medium truncate">{show.title}</h3>
+                <p className="text-muted-foreground text-xs mt-0.5 truncate">{show.description}</p>
               </div>
             ))}
           </div>
         </div>
       </main>
 
-      {/* 左侧导航栏 - 移除 Logo 部分 */}
-      <nav className="fixed left-0 top-0 h-screen w-[220px] z-20 border-none pt-[60px]"> {/* 添加顶部内边距 */}
-        {/* 背景遮罩 */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(-90deg, rgba(20, 20, 20, 0) 1%, rgba(20, 20, 20, .6) 99%)'
-        }} />
-
-        {/* 导航内容 */}
+      <nav className="fixed left-0 top-0 h-screen w-[220px] z-20 border-none pt-[60px] ">
         <div className="relative h-full overflow-y-auto custom-scrollbar direction-rtl">
           <div className="direction-ltr">
-            {/* 主导航项 */}
             <div className="space-y-1 pb-6">
-              {sideNavItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="flex items-center px-6 py-3 text-gray-400/60 hover:text-white
-                    transition-colors duration-300"
-                >
-                  <span className="mr-3 opacity-60 text-base">
-                    {item.icon}
-                  </span>
-                  <span className="text-sm">
-                    {item.label}
-                  </span>
-                </Link>
-              ))}
+              {sideNavItems.map((item) => {
+                const isActive = pathname === item.href || 
+                  (pathname === '/' && item.href === '/') ||
+                  (pathname !== '/' && item.href !== '/' && pathname.startsWith(item.href));
+                
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`flex items-center px-6 py-3 hover:text-gray-900 dark:hover:text-white
+                      transition-colors duration-300 ${
+                        isActive 
+                          ? 'text-gray-900 dark:text-white' 
+                          : 'text-gray-600 dark:text-gray-300/80'
+                      }`}
+                  >
+                    <span className={`mr-3 text-base ${
+                      isActive ? 'opacity-100' : 'opacity-60'
+                    }`}>
+                      {item.icon}
+                    </span>
+                    <span className="text-sm">
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
 
-            {/* 底部链接 - 恢复分隔线 */}
             <div className="relative">
-              {/* 主分隔线 */}
-              <div className="absolute inset-x-6 top-0 h-[1px] bg-white/10" />
+              <div className="absolute inset-x-6 top-0 h-[1px] bg-gray-200 dark:bg-white/10" />
               
               <div className="px-6 py-6">
-                {/* 隐私协议组 */}
                 <div className="space-y-2 mb-4">
                   {footerLinks.privacy.map((link) => (
                     <Link
                       key={link.label}
                       href={link.href}
-                      className="block text-xs text-gray-500 hover:text-gray-400"
+                      className="block text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                       {link.label}
                     </Link>
                   ))}
                 </div>
 
-                {/* 关于组 - 流式布局 + 竖线分隔 */}
-                <div className="pt-4 border-t border-white/5">
+                <div className="pt-4 border-t border-gray-200 dark:border-white/10">
                   <div className="flex flex-wrap">
                     {footerLinks.about.map((link, index) => (
                       <div key={link.label} className="flex items-center">
                         <Link
                           href={link.href}
-                          className="text-xs text-gray-500 hover:text-gray-400 whitespace-nowrap"
+                          className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap"
                         >
                           {link.label}
                         </Link>
                         {index % 2 === 0 && index !== footerLinks.about.length - 1 && (
-                          <span className="mx-2 text-gray-500/50">|</span>
+                          <span className="mx-2 text-gray-400 dark:text-gray-500/50">|</span>
                         )}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* 版权信息 */}
-                <div className="pt-4 border-t border-white/5">
+                <div className="pt-4 border-t border-gray-200 dark:border-white/10">
                   {footerLinks.copyright.map((link) => (
                     <Link
                       key={link.label}
                       href={link.href}
-                      className="block text-xs text-gray-500/80 hover:text-gray-500"
+                      className="block text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                       {link.label}
                     </Link>
@@ -373,31 +405,34 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* 顶部导航栏 - 提高层级 */}
-      <header className="fixed top-0 right-0 left-0 flex items-center p-4 z-50
-        bg-gradient-to-b from-black/40 to-transparent backdrop-blur-[1px]">
-        {/* Logo */}
-        <div className="w-[220px] px-6">
+      <header className="fixed top-0 right-0 left-0 flex items-center p-4 z-50">
+        <div className="absolute inset-0 bg-white dark:bg-transparent dark:bg-gradient-to-b dark:from-black/40 dark:to-transparent backdrop-blur-[1px]" />
+
+        <div className="relative w-[220px] px-6">
           <YouTubeLogo />
         </div>
 
-        {/* 搜索框和其他导航 */}
-        <div className="flex-1 flex justify-between items-center">
+        <div className="relative flex-1 flex justify-between items-center">
           <div className="flex-1 max-w-xl">
             <input
               type="search"
               placeholder="大秦打更人"
-              className="w-full bg-black/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/30"
+              className="w-full bg-gray-100 dark:bg-black/20 px-4 py-1.5 rounded-full text-sm 
+                text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 
+                focus:outline-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-white/30"
             />
           </div>
           <div className="flex items-center gap-4 mr-4">
-            <Link href="#" className="text-gray-300 hover:text-white text-sm">会员专区</Link>
-            <Link href="#" className="text-gray-300 hover:text-white text-sm">游戏</Link>
-            <Link href="#" className="text-gray-300 hover:text-white text-sm">快捷访问</Link>
-            <Link href="#" className="text-gray-300 hover:text-white text-sm">历史</Link>
-            <Link href="#" className="text-gray-300 hover:text-white text-sm">创作</Link>
-            <Link href="#" className="text-gray-300 hover:text-white text-sm">客户端</Link>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-sm px-6">登录</Button>
+            <Link href="#" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm">会员专区</Link>
+            <Link href="#" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm">游戏</Link>
+            <Link href="#" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm">快捷访问</Link>
+            <Link href="#" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm">历史</Link>
+            <Link href="#" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm">创作</Link>
+            <Link href="#" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm">客户端</Link>
+            <ThemeToggle />
+            <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm px-6">
+              登录
+            </Button>
           </div>
         </div>
       </header>
