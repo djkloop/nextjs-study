@@ -32,7 +32,7 @@ const routes = [
   { path: 'board-games', title: '棋牌游戏库' },
 ];
 
-const template = (title) => `import PageTemplate from "@/app/_components/PageTemplate";
+const template = (title: string) => `import PageTemplate from "@/app/_components/PageTemplate";
 
 export default function ${title.replace(/[^a-zA-Z0-9]/g, '')}Page() {
   return <PageTemplate title="${title}" />;
