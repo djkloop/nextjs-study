@@ -1,4 +1,11 @@
-export const sideNavItems = [
+interface NavItem {
+  icon: string;
+  label: string;
+  href: string;
+  subItems?: { label: string; href: string; }[];
+}
+
+export const sideNavItems: NavItem[] = [
   { icon: "⭐", label: "首页", href: "/" },
   { icon: "👑", label: "VIP会员", href: "/vip" },
   { icon: "📱", label: "中视频", href: "/short-video" },
