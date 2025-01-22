@@ -1,3 +1,5 @@
+import { Show } from "@/types";
+
 export const shows = [
   {
     id: 1,
@@ -39,4 +41,4 @@ export const shows = [
     description: "中国科幻史诗续作",
     bannerImage: "https://image.tmdb.org/t/p/original/ziEuG1essDuWuC5lpWUaw1uXY2O.jpg",
   }
-]; 
+] as const as Show[]; 

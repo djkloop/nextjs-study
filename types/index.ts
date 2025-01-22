@@ -5,5 +5,5 @@ export interface Show {
   subtitle: string;
   description: string;
   bannerImage: string;
-  tag: string;
+  tag?: string;
 } 
