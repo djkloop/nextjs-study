@@ -6,8 +6,6 @@ interface BannerControlsProps {
   shows: Show[];
   currentIndex: number;
   progress: number;
-  onNext: () => void;
-  onPrev: () => void;
   onSelect: (index: number) => void;
 }
 
@@ -15,8 +13,6 @@ export function BannerControls({
   shows,
   currentIndex,
   progress,
-  onNext,
-  onPrev,
   onSelect,
 }: BannerControlsProps) {
   const [startIndex, setStartIndex] = useState(0);

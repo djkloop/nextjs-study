@@ -1,6 +1,8 @@
+"use client"
+
 import { BannerSlide } from "./BannerSlide";
 import { BannerControls } from "./BannerControls";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Show } from "@/types";
 
 interface BannerProps {
@@ -10,6 +12,14 @@ interface BannerProps {
 export function Banner({ shows }: BannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % shows.length);
+  }, [shows.length]);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + shows.length) % shows.length);
+  }, [shows.length]);
 
   useEffect(() => {
     let startTime: number;
@@ -38,15 +48,7 @@ export function Banner({ shows }: BannerProps) {
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [currentIndex]);
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % shows.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + shows.length) % shows.length);
-  };
+  }, [currentIndex, handleNext]);
 
   return (
     <div className="relative h-[40vw]">
@@ -55,8 +57,6 @@ export function Banner({ shows }: BannerProps) {
         shows={shows}
         currentIndex={currentIndex}
         progress={progress}
-        onNext={handleNext}
-        onPrev={handlePrev}
         onSelect={setCurrentIndex}
       />
     </div>
