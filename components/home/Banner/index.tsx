@@ -17,10 +17,6 @@ export function Banner({ shows }: BannerProps) {
     setCurrentIndex((prev) => (prev + 1) % shows.length);
   }, [shows.length]);
 
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + shows.length) % shows.length);
-  }, [shows.length]);
-
   useEffect(() => {
     let startTime: number;
     let animationFrame: number;
