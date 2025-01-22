@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from 'react';
+import { YouTubeLogo } from "@/components/YouTubeLogo";
 
 export default function Home() {
   const sideNavItems = [
@@ -36,51 +37,6 @@ export default function Home() {
     { icon: "👶", label: "育儿", href: "/parenting" },
     { icon: "🚗", label: "汽车", href: "/auto" },
     { icon: "🎲", label: "棋牌游戏库", href: "/board-games" },
-  ];
-
-  const bannerData = {
-    image: "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2899260455.webp",
-    title: "繁花",
-    subtitle: "马伊琍胡歌演绎旧上海",
-    description: "王家卫监制 沪上繁华"
-  };
-
-  const carouselShows = [
-    {
-      id: 1,
-      image: "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2899260455.webp",
-      title: "非常欢迎队",
-      subtitle: "王鹤棣 田曦薇 英雄成长",
-      description: "点映看结局！汗七安抗二贼血溅三尺"
-    },
-    {
-      id: 2,
-      image: "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2898057074.webp",
-      title: "大秦打更人",
-      subtitle: "王鹤棣热血追凶",
-      description: "大秦世界的热血传奇"
-    },
-    {
-      id: 3,
-      image: "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2896669641.webp",
-      title: "驻站",
-      subtitle: "郭京飞陈数演绎基层故事",
-      description: "温暖人心的基层故事"
-    },
-    {
-      id: 4,
-      image: "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2897690068.webp",
-      title: "学习时刻",
-      subtitle: "励志成长故事",
-      description: "青春励志正能量"
-    },
-    {
-      id: 5,
-      image: "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2895465725.webp",
-      title: "斗笑社 第3季",
-      subtitle: "爆笑脱口秀",
-      description: "年轻人的快乐源泉"
-    }
   ];
 
   const shows = [
@@ -421,9 +377,8 @@ export default function Home() {
       <header className="fixed top-0 right-0 left-0 flex items-center p-4 z-50
         bg-gradient-to-b from-black/40 to-transparent backdrop-blur-[1px]">
         {/* Logo */}
-        <div className="w-[220px] flex items-center px-6">
-          <div className="text-blue-400 text-2xl mr-2">▶</div>
-          <div className="text-white text-lg font-bold">腾讯视频</div>
+        <div className="w-[220px] px-6">
+          <YouTubeLogo />
         </div>
 
         {/* 搜索框和其他导航 */}
